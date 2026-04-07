@@ -617,26 +617,47 @@
   }
 
   // ===== TTS =====
-  // iOS Safari対応: speechSynthesisをユーザーのタップから直接呼ぶ（最優先）
-  // フォールバック: Audio要素 + StreamElements API
+  // 方法1（最優先）: Google TTS → 自然な音声・センテンス単位で区切り
+  // 方法2（フォールバック）: speechSynthesis + iOSの高品質ボイス自動選択
 
-  function buildChunks(text, maxLen) {
-    const words = text.split(' ');
+  let bestVoice = null;
+
+  function initVoice() {
+    if (!window.speechSynthesis) return;
+    const voices = window.speechSynthesis.getVoices();
+    if (!voices.length) return;
+    const en = voices.filter(v => v.lang && v.lang.startsWith('en'));
+    bestVoice =
+      en.find(v => /enhanced|premium|neural/i.test(v.name) && v.lang === 'en-US') ||
+      en.find(v => /enhanced|premium|neural/i.test(v.name)) ||
+      en.find(v => v.lang === 'en-US') ||
+      en[0] || null;
+  }
+  if (window.speechSynthesis) {
+    initVoice();
+    window.speechSynthesis.addEventListener('voiceschanged', initVoice);
+  }
+
+  // センテンス単位でテキストを分割（句点・疑問符・感嘆符）
+  function buildSentenceChunks(text, maxLen) {
+    const raw = text.match(/[^.!?]+[.!?]+\s*/g) || [text];
     const chunks = [];
-    let chunk = '';
-    for (const word of words) {
-      const next = chunk ? chunk + ' ' + word : word;
-      if (next.length > maxLen && chunk) { chunks.push(chunk); chunk = word; }
-      else { chunk = next; }
+    let cur = '';
+    for (const sent of raw) {
+      if ((cur + sent).length <= maxLen) {
+        cur += sent;
+      } else {
+        if (cur) chunks.push(cur.trim());
+        cur = sent.length > maxLen ? sent : sent;
+      }
     }
-    if (chunk) chunks.push(chunk);
-    return chunks;
+    if (cur) chunks.push(cur.trim());
+    return chunks.filter(c => c.length > 0);
   }
 
   function playTTS() {
     const btn = document.getElementById("listenBtn");
 
-    // 再生中なら停止
     if (isSpeaking) {
       isSpeaking = false;
       chunkQueue = [];
@@ -652,52 +673,14 @@
     btn.innerHTML = '<span class="btn-icon">⏸️</span><span>再生中...</span>';
     setStatus("🎧 音声を準備中...", "");
 
-    // ── 方法1: speechSynthesis（iOS Safari含む全ブラウザで動作）──
-    // ユーザーのタップから直接呼ぶことでiOSの制限を回避
-    if (window.speechSynthesis) {
-      window.speechSynthesis.cancel();
-
-      // iOS長文対策: 文を複数チャンクに分けてキューに積む
-      const synchunks = buildChunks(s.en, 200);
-      let synIdx = 0;
-
-      function speakSynChunk() {
-        if (!isSpeaking || synIdx >= synchunks.length) {
-          if (isSpeaking) {
-            isSpeaking = false;
-            btn.innerHTML = '<span class="btn-icon">🔊</span><span>お手本を聞く</span>';
-            setStatus("✅ 聞けた！今度は自分でシャドーイング🎤", "ok");
-          }
-          return;
-        }
-        const utter = new SpeechSynthesisUtterance(synchunks[synIdx]);
-        utter.lang = "en-US";
-        utter.rate = Math.min(Math.max(speechSpeed, 0.5), 2.0);
-        if (synIdx === 0) utter.onstart = () => setStatus("🎧 音声を聞いています...", "");
-        utter.onend = () => { synIdx++; speakSynChunk(); };
-        utter.onerror = () => {
-          // speechSynthesis失敗 → StreamElements APIにフォールバック
-          if (synIdx === 0) playWithStreamElements(s.en);
-        };
-        window.speechSynthesis.speak(utter);
-      }
-
-      speakSynChunk(); // タップから同期的に呼ぶ
-      return;
-    }
-
-    // ── 方法2: Audio要素 + StreamElements API（speechSynthesisがない場合）──
-    playWithStreamElements(s.en);
-  }
-
-  function playWithStreamElements(text) {
-    chunkQueue = buildChunks(text, 300);
+    // ── 方法1: Google TTS（自然な音声・センテンス間に自然なポーズ）──
     if (!currentAudio) currentAudio = new Audio();
     currentAudio.playbackRate = Math.min(Math.max(speechSpeed, 0.5), 2.0);
-    playNextChunk();
+    chunkQueue = buildSentenceChunks(s.en, 150);
+    playGoogleChunk();
   }
 
-  function playNextChunk() {
+  function playGoogleChunk() {
     if (!isSpeaking || chunkQueue.length === 0) {
       if (isSpeaking) {
         isSpeaking = false;
@@ -708,20 +691,60 @@
       return;
     }
     const chunk = chunkQueue.shift();
-    const url = "https://api.streamelements.com/kappa/v2/speech?voice=Brian&text=" + encodeURIComponent(chunk);
+    const url = "https://translate.googleapis.com/translate_tts?ie=UTF-8&q="
+      + encodeURIComponent(chunk) + "&tl=en-US&client=gtx&ttsspeed=0.9";
+
     currentAudio.oncanplay = () => setStatus("🎧 音声を聞いています...", "");
-    currentAudio.onended = playNextChunk;
+    currentAudio.onended = () => {
+      // センテンス間に300msのポーズ（自然な区切り）
+      if (isSpeaking) setTimeout(playGoogleChunk, 300);
+    };
     currentAudio.onerror = () => {
-      isSpeaking = false;
-      document.getElementById("listenBtn").innerHTML = '<span class="btn-icon">🔊</span><span>お手本を聞く</span>';
-      setStatus("⚠️ 音声エラー。ネット接続を確認してください", "err");
+      // Google TTS失敗 → speechSynthesisにフォールバック
+      chunkQueue = [];
+      playWithSpeechSynthesis(sentences[currentIdx].en);
     };
     currentAudio.src = url;
     currentAudio.play().catch(() => {
+      chunkQueue = [];
+      playWithSpeechSynthesis(sentences[currentIdx].en);
+    });
+  }
+
+  // ── 方法2: speechSynthesis + 高品質ボイス自動選択 ──
+  function playWithSpeechSynthesis(text) {
+    if (!window.speechSynthesis) {
       isSpeaking = false;
       document.getElementById("listenBtn").innerHTML = '<span class="btn-icon">🔊</span><span>お手本を聞く</span>';
       setStatus("⚠️ 音声エラー。ネット接続を確認してください", "err");
-    });
+      return;
+    }
+    window.speechSynthesis.cancel();
+    const chunks = buildSentenceChunks(text, 200);
+    let idx = 0;
+    function next() {
+      if (!isSpeaking || idx >= chunks.length) {
+        if (isSpeaking) {
+          isSpeaking = false;
+          document.getElementById("listenBtn").innerHTML = '<span class="btn-icon">🔊</span><span>お手本を聞く</span>';
+          setStatus("✅ 聞けた！今度は自分でシャドーイング🎤", "ok");
+        }
+        return;
+      }
+      const utter = new SpeechSynthesisUtterance(chunks[idx]);
+      utter.lang = "en-US";
+      utter.rate = Math.min(Math.max(speechSpeed, 0.5), 2.0);
+      if (bestVoice) utter.voice = bestVoice;
+      if (idx === 0) utter.onstart = () => setStatus("🎧 音声を聞いています...", "");
+      utter.onend = () => { idx++; next(); };
+      utter.onerror = () => {
+        isSpeaking = false;
+        document.getElementById("listenBtn").innerHTML = '<span class="btn-icon">🔊</span><span>お手本を聞く</span>';
+        setStatus("⚠️ 音声エラー", "err");
+      };
+      window.speechSynthesis.speak(utter);
+    }
+    next();
   }
 
   // ===== RECORDING =====

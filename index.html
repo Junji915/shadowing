@@ -671,47 +671,13 @@
     const s = sentences[currentIdx];
     isSpeaking = true;
     btn.innerHTML = '<span class="btn-icon">⏸️</span><span>再生中...</span>';
-    setStatus("🎧 音声を準備中...", "");
+    setStatus("🎧 音声を聞いています...", "");
 
-    // ── 方法1: Google TTS（自然な音声・センテンス間に自然なポーズ）──
-    if (!currentAudio) currentAudio = new Audio();
-    currentAudio.playbackRate = Math.min(Math.max(speechSpeed, 0.5), 2.0);
-    chunkQueue = buildSentenceChunks(s.en, 150);
-    playGoogleChunk();
+    // speechSynthesis（iOS Safari確認済・ユーザーのタップから直接呼ぶ）
+    playWithSpeechSynthesis(s.en);
   }
 
-  function playGoogleChunk() {
-    if (!isSpeaking || chunkQueue.length === 0) {
-      if (isSpeaking) {
-        isSpeaking = false;
-        if (currentAudio) currentAudio.src = "";
-        document.getElementById("listenBtn").innerHTML = '<span class="btn-icon">🔊</span><span>お手本を聞く</span>';
-        setStatus("✅ 聞けた！今度は自分でシャドーイング🎤", "ok");
-      }
-      return;
-    }
-    const chunk = chunkQueue.shift();
-    const url = "https://translate.googleapis.com/translate_tts?ie=UTF-8&q="
-      + encodeURIComponent(chunk) + "&tl=en-US&client=gtx&ttsspeed=0.9";
-
-    currentAudio.oncanplay = () => setStatus("🎧 音声を聞いています...", "");
-    currentAudio.onended = () => {
-      // センテンス間に300msのポーズ（自然な区切り）
-      if (isSpeaking) setTimeout(playGoogleChunk, 300);
-    };
-    currentAudio.onerror = () => {
-      // Google TTS失敗 → speechSynthesisにフォールバック
-      chunkQueue = [];
-      playWithSpeechSynthesis(sentences[currentIdx].en);
-    };
-    currentAudio.src = url;
-    currentAudio.play().catch(() => {
-      chunkQueue = [];
-      playWithSpeechSynthesis(sentences[currentIdx].en);
-    });
-  }
-
-  // ── 方法2: speechSynthesis + 高品質ボイス自動選択 ──
+  // ── speechSynthesis + センテンス単位区切り + 高品質ボイス自動選択 ──
   function playWithSpeechSynthesis(text) {
     if (!window.speechSynthesis) {
       isSpeaking = false;

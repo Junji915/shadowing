@@ -616,22 +616,18 @@
     document.getElementById("progressFill").style.width = pct + "%";
   }
 
-  // ===== TTS（Audio要素 + StreamElements API）=====
-  // speechSynthesis はiOSで不安定なため、Audio要素方式に切り替え
+  // ===== TTS =====
+  // iOS Safari対応: speechSynthesisをユーザーのタップから直接呼ぶ（最優先）
+  // フォールバック: Audio要素 + StreamElements API
 
   function buildChunks(text, maxLen) {
-    // テキストを単語境界でmaxLen文字以内に分割
     const words = text.split(' ');
     const chunks = [];
     let chunk = '';
     for (const word of words) {
       const next = chunk ? chunk + ' ' + word : word;
-      if (next.length > maxLen && chunk) {
-        chunks.push(chunk);
-        chunk = word;
-      } else {
-        chunk = next;
-      }
+      if (next.length > maxLen && chunk) { chunks.push(chunk); chunk = word; }
+      else { chunk = next; }
     }
     if (chunk) chunks.push(chunk);
     return chunks;
@@ -654,16 +650,51 @@
     const s = sentences[currentIdx];
     isSpeaking = true;
     btn.innerHTML = '<span class="btn-icon">⏸️</span><span>再生中...</span>';
-    setStatus("🎧 音声を読み込み中...", "");
+    setStatus("🎧 音声を準備中...", "");
 
-    // 300文字以内のチャンクに分割（StreamElements APIの制限対応）
-    chunkQueue = buildChunks(s.en, 300);
+    // ── 方法1: speechSynthesis（iOS Safari含む全ブラウザで動作）──
+    // ユーザーのタップから直接呼ぶことでiOSの制限を回避
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
 
-    // Audio要素をここで生成（ユーザーのタップ操作から直接呼ぶことでiOSの制限を回避）
+      // iOS長文対策: 文を複数チャンクに分けてキューに積む
+      const synchunks = buildChunks(s.en, 200);
+      let synIdx = 0;
+
+      function speakSynChunk() {
+        if (!isSpeaking || synIdx >= synchunks.length) {
+          if (isSpeaking) {
+            isSpeaking = false;
+            btn.innerHTML = '<span class="btn-icon">🔊</span><span>お手本を聞く</span>';
+            setStatus("✅ 聞けた！今度は自分でシャドーイング🎤", "ok");
+          }
+          return;
+        }
+        const utter = new SpeechSynthesisUtterance(synchunks[synIdx]);
+        utter.lang = "en-US";
+        utter.rate = Math.min(Math.max(speechSpeed, 0.5), 2.0);
+        if (synIdx === 0) utter.onstart = () => setStatus("🎧 音声を聞いています...", "");
+        utter.onend = () => { synIdx++; speakSynChunk(); };
+        utter.onerror = () => {
+          // speechSynthesis失敗 → StreamElements APIにフォールバック
+          if (synIdx === 0) playWithStreamElements(s.en);
+        };
+        window.speechSynthesis.speak(utter);
+      }
+
+      speakSynChunk(); // タップから同期的に呼ぶ
+      return;
+    }
+
+    // ── 方法2: Audio要素 + StreamElements API（speechSynthesisがない場合）──
+    playWithStreamElements(s.en);
+  }
+
+  function playWithStreamElements(text) {
+    chunkQueue = buildChunks(text, 300);
     if (!currentAudio) currentAudio = new Audio();
     currentAudio.playbackRate = Math.min(Math.max(speechSpeed, 0.5), 2.0);
-
-    playNextChunk(); // タップから同期的に呼ぶ
+    playNextChunk();
   }
 
   function playNextChunk() {
@@ -676,48 +707,21 @@
       }
       return;
     }
-
     const chunk = chunkQueue.shift();
-    const url = "https://api.streamelements.com/kappa/v2/speech?voice=Brian&text="
-                + encodeURIComponent(chunk);
-
-    currentAudio.oncanplay = () => {
-      setStatus("🎧 音声を聞いています...", "");
-    };
+    const url = "https://api.streamelements.com/kappa/v2/speech?voice=Brian&text=" + encodeURIComponent(chunk);
+    currentAudio.oncanplay = () => setStatus("🎧 音声を聞いています...", "");
     currentAudio.onended = playNextChunk;
     currentAudio.onerror = () => {
-      // API失敗 → speechSynthesisにフォールバック
-      speakWithFallback();
+      isSpeaking = false;
+      document.getElementById("listenBtn").innerHTML = '<span class="btn-icon">🔊</span><span>お手本を聞く</span>';
+      setStatus("⚠️ 音声エラー。ネット接続を確認してください", "err");
     };
-
     currentAudio.src = url;
-    currentAudio.play().catch(() => speakWithFallback());
-  }
-
-  function speakWithFallback() {
-    if (!isSpeaking) return;
-    chunkQueue = [];
-    if (!window.speechSynthesis) {
+    currentAudio.play().catch(() => {
       isSpeaking = false;
       document.getElementById("listenBtn").innerHTML = '<span class="btn-icon">🔊</span><span>お手本を聞く</span>';
-      setStatus("⚠️ 音声エラー。ネット接続と音量を確認してください", "err");
-      return;
-    }
-    const s = sentences[currentIdx];
-    const utter = new SpeechSynthesisUtterance(s.en);
-    utter.lang = "en-US";
-    utter.rate = speechSpeed;
-    utter.onend = () => {
-      isSpeaking = false;
-      document.getElementById("listenBtn").innerHTML = '<span class="btn-icon">🔊</span><span>お手本を聞く</span>';
-      setStatus("✅ 聞けた！今度は自分でシャドーイング🎤", "ok");
-    };
-    utter.onerror = () => {
-      isSpeaking = false;
-      document.getElementById("listenBtn").innerHTML = '<span class="btn-icon">🔊</span><span>お手本を聞く</span>';
-      setStatus("⚠️ 音声エラー", "err");
-    };
-    window.speechSynthesis.speak(utter);
+      setStatus("⚠️ 音声エラー。ネット接続を確認してください", "err");
+    });
   }
 
   // ===== RECORDING =====

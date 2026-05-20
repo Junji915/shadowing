@@ -91,7 +91,7 @@
       font-size: 15px;
       font-weight: bold;
       cursor: pointer;
-      min-width: 100px;
+      min-width: 90px;
     }
     .action-btn.secondary {
       background-color: #95a5a6;
@@ -197,8 +197,9 @@
       <div class="translation-box" id="translationDisplay" style="display: none;"></div>
       
       <div class="btn-group">
-        <button class="action-btn" onclick="playAudio()" style="background-color: #2ecc71; flex: 2;">🔊 再生する</button>
-        <button class="action-btn secondary" onclick="toggleTranslationVisibility()" style="flex: 1;">🌐 翻訳</button>
+        <button class="action-btn" onclick="playAudio()" style="background-color: #2ecc71; flex: 2;">🔊 再生</button>
+        <button class="action-btn" onclick="stopAudio()" style="background-color: #e74c3c; flex: 1.5;">🛑 停止</button>
+        <button class="action-btn secondary" onclick="toggleTranslationVisibility()" style="flex: 1.2;">🌐 翻訳</button>
       </div>
 
       <div class="speed-container">
@@ -218,7 +219,7 @@
     let currentBlobUrl = null;
     let currentEnglish = "";
     let currentTranslation = "";
-    let currentPlaybackRate = 1.0; // 速度の初期値
+    let currentPlaybackRate = 1.0;
     
     let shadowingHistory = JSON.parse(localStorage.getItem('shadow_history') || '[]');
 
@@ -245,17 +246,20 @@
       box.style.display = (box.style.display === 'none') ? 'block' : 'none';
     }
 
-    // 🆕 スピード変更処理
     function setSpeed(rate, btnElement) {
       currentPlaybackRate = rate;
-      
-      // ボタンの見た目（オレンジ色のハイライト）を切り替える
       document.querySelectorAll('.speed-btn').forEach(btn => btn.classList.remove('active'));
       btnElement.classList.add('active');
       
-      // 再生中のオーディオがあれば即座に速度を反映
       const player = document.getElementById('ttsPlayer');
       player.playbackRate = rate;
+    }
+
+    // 🆕 停止ボタンの処理
+    function stopAudio() {
+      const player = document.getElementById('ttsPlayer');
+      player.pause();         // 音声を一時停止する
+      player.currentTime = 0; // 再生位置を一番最初（0秒）に巻き戻す
     }
 
     async function processText() {
@@ -343,7 +347,6 @@
       const player = document.getElementById('ttsPlayer');
       player.src = currentBlobUrl;
       
-      // 🔊 再生する瞬間に、選択されているスピード（0.8xや1.2xなど）を適用する
       player.defaultPlaybackRate = currentPlaybackRate;
       player.playbackRate = currentPlaybackRate;
       

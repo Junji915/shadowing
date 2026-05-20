@@ -3,873 +3,237 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>English Shadowing Practice</title>
+  <title>ジュンジのShadowing App</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --primary: #4F6EF7;
-      --primary-dark: #3A56D4;
-      --accent: #FF6B6B;
-      --accent-dark: #e05555;
-      --success: #4CAF50;
-      --bg: #F0F4FF;
-      --card: #FFFFFF;
-      --text: #1A1D2E;
-      --text-muted: #6B7280;
-      --border: #E5E7EB;
-      --shadow: 0 4px 20px rgba(79,110,247,0.12);
-    }
-
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      padding-bottom: env(safe-area-inset-bottom);
+      background-color: #f0f4f8;
+      color: #333;
+      padding: 20px;
+      margin: 0;
     }
-
-    /* Header */
-    .header {
-      background: var(--primary);
-      color: white;
-      padding: 16px 20px 14px;
-      padding-top: calc(16px + env(safe-area-inset-top));
+    h1 {
+      font-size: 22px;
       text-align: center;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: 0 2px 12px rgba(79,110,247,0.3);
+      color: #2c3e50;
+      margin-bottom: 20px;
     }
-    .header h1 { font-size: 18px; font-weight: 700; letter-spacing: 0.5px; }
-    .header p { font-size: 12px; opacity: 0.85; margin-top: 2px; }
-
-    /* Category Tabs */
-    .category-bar {
-      display: flex;
-      gap: 8px;
-      padding: 14px 16px;
-      overflow-x: auto;
-      scrollbar-width: none;
-      background: white;
-      border-bottom: 1px solid var(--border);
-      -webkit-overflow-scrolling: touch;
+    .container {
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
     }
-    .category-bar::-webkit-scrollbar { display: none; }
-    .cat-btn {
-      flex-shrink: 0;
-      padding: 7px 14px;
-      border-radius: 20px;
-      border: 1.5px solid var(--border);
-      background: white;
-      color: var(--text-muted);
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .cat-btn.active {
-      background: var(--primary);
-      border-color: var(--primary);
-      color: white;
-    }
-
-    /* Progress */
-    .progress-bar-wrap {
-      padding: 10px 16px 0;
-    }
-    .progress-info {
-      display: flex;
-      justify-content: space-between;
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-bottom: 6px;
-    }
-    .progress-bar {
-      height: 5px;
-      background: var(--border);
-      border-radius: 99px;
-      overflow: hidden;
-    }
-    .progress-fill {
-      height: 100%;
-      background: var(--primary);
-      border-radius: 99px;
-      transition: width 0.4s ease;
-    }
-
-    /* Main Card */
-    .main {
-      padding: 14px 16px 100px;
-    }
-
-    .card {
-      background: var(--card);
-      border-radius: 20px;
-      padding: 22px 20px 20px;
-      box-shadow: var(--shadow);
-      margin-bottom: 14px;
-    }
-
-    .scene-tag {
-      display: inline-block;
-      background: #EEF2FF;
-      color: var(--primary);
-      font-size: 11px;
-      font-weight: 700;
-      padding: 4px 10px;
-      border-radius: 99px;
-      margin-bottom: 14px;
-      letter-spacing: 0.3px;
-    }
-
-    .sentence-en {
-      font-size: 16px;
-      font-weight: 600;
-      line-height: 1.75;
-      color: var(--text);
-      margin-bottom: 10px;
-      word-break: break-word;
-    }
-
-    .sentence-ja {
+    label {
       font-size: 14px;
-      color: var(--text-muted);
-      line-height: 1.6;
-      padding-top: 10px;
-      border-top: 1px solid var(--border);
-      display: none;
+      font-weight: bold;
+      color: #7f8c8d;
+      display: block;
+      margin-bottom: 8px;
     }
-    .sentence-ja.show { display: block; }
-
-    .translate-btn {
-      background: none;
-      border: none;
-      color: var(--primary);
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      padding: 4px 0;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      margin-top: 8px;
+    textarea {
+      width: 100%;
+      height: 150px;
+      padding: 12px;
+      border: 1px solid #bdc3c7;
+      border-radius: 12px;
+      font-size: 16px;
+      box-sizing: border-box;
+      resize: none;
+      margin-bottom: 16px;
+      font-family: inherit;
     }
-
-    /* Pronunciation hint */
-    .phonetics {
-      font-size: 13px;
-      color: #9CA3AF;
-      font-style: italic;
-      margin-bottom: 4px;
+    input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #bdc3c7;
+      border-radius: 12px;
+      font-size: 14px;
+      box-sizing: border-box;
+      margin-bottom: 16px;
     }
-
-    /* Controls */
-    .controls {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 4px;
-    }
-
-    .btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-      padding: 14px 10px;
-      border-radius: 14px;
-      border: none;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.15s;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-    }
-    .btn:active { transform: scale(0.96); }
-    .btn-icon { font-size: 22px; line-height: 1; }
-
-    .btn-listen {
-      background: var(--primary);
-      color: white;
-      grid-column: 1 / -1;
-      flex-direction: row;
-      gap: 8px;
+    button {
+      width: 100%;
       padding: 16px;
-    }
-    .btn-listen .btn-icon { font-size: 20px; }
-
-    .btn-record {
-      background: #FFF0F0;
-      color: var(--accent);
-      border: 1.5px solid #FFD6D6;
-    }
-    .btn-record.recording {
-      background: var(--accent);
+      background-color: #3498db;
       color: white;
-      border-color: var(--accent);
-      animation: pulse 1.2s ease-in-out infinite;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+      transition: background-color 0.2s;
     }
-    @keyframes pulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(255,107,107,0.4); }
-      50% { box-shadow: 0 0 0 8px rgba(255,107,107,0); }
+    button:active {
+      background-color: #2980b9;
     }
-
-    .btn-play {
-      background: #F0FFF4;
-      color: #16A34A;
-      border: 1.5px solid #D1FAE5;
-    }
-    .btn-play:disabled {
-      opacity: 0.4;
+    button:disabled {
+      background-color: #95a5a6;
+      box-shadow: none;
       cursor: not-allowed;
     }
-
-    /* Navigation */
-    .nav-row {
-      display: flex;
-      gap: 10px;
+    .player-container {
+      margin-top: 20px;
+      display: none; /* 音声生成後に表示 */
     }
-    .btn-nav {
-      flex: 1;
-      background: white;
-      color: var(--text);
-      border: 1.5px solid var(--border);
-      padding: 13px;
-      border-radius: 14px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      -webkit-tap-highlight-color: transparent;
-      transition: all 0.15s;
+    audio {
+      width: 100%;
+      margin-bottom: 12px;
     }
-    .btn-nav:active { transform: scale(0.97); background: #F3F4F6; }
-
-    /* Speed control */
-    .speed-card {
-      background: white;
-      border-radius: 16px;
-      padding: 14px 18px;
-      box-shadow: var(--shadow);
-    }
-    .speed-label {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-muted);
-      margin-bottom: 10px;
+    .speed-controls {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      gap: 10px;
     }
-    .speed-value {
-      color: var(--primary);
-      font-size: 15px;
-      font-weight: 700;
+    .speed-btn {
+      background-color: #ecf0f1;
+      color: #2c3e50;
+      box-shadow: none;
+      padding: 10px;
+      font-size: 14px;
     }
-    .speed-slider {
-      width: 100%;
-      -webkit-appearance: none;
-      height: 5px;
-      border-radius: 99px;
-      background: var(--border);
-      outline: none;
-    }
-    .speed-slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: var(--primary);
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(79,110,247,0.4);
-    }
-
-    /* Tips */
-    .tip-box {
-      background: #FFFBEB;
-      border: 1px solid #FDE68A;
-      border-radius: 12px;
-      padding: 12px 14px;
-      font-size: 13px;
-      color: #92400E;
-      line-height: 1.5;
-    }
-    .tip-box strong { color: #78350F; }
-
-    /* Status message */
-    .status-msg {
-      text-align: center;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-muted);
-      padding: 8px;
-      min-height: 28px;
-      transition: color 0.3s;
-    }
-    .status-msg.ok { color: var(--success); }
-    .status-msg.err { color: var(--accent); }
-
-    /* Completion banner */
-    .completion-banner {
-      display: none;
-      background: linear-gradient(135deg, #4F6EF7, #7C3AED);
+    .speed-btn.active {
+      background-color: #3498db;
       color: white;
-      border-radius: 20px;
-      padding: 28px 20px;
-      text-align: center;
-      box-shadow: var(--shadow);
     }
-    .completion-banner.show { display: block; }
-    .completion-banner h2 { font-size: 26px; margin-bottom: 8px; }
-    .completion-banner p { font-size: 15px; opacity: 0.9; margin-bottom: 18px; }
-    .btn-restart {
-      background: white;
-      color: var(--primary);
-      border: none;
-      padding: 12px 28px;
-      border-radius: 12px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
+    .settings-toggle {
+      text-align: right;
+      margin-bottom: 10px;
+    }
+    .settings-toggle a {
+      color: #95a5a6;
+      font-size: 13px;
+      text-decoration: none;
     }
   </style>
 </head>
 <body>
 
-<div class="header">
-  <h1>🎙️ English Shadowing</h1>
-  <p>中級 — 約1分間パッセージ × 18本</p>
-</div>
+  <h1>ジュンジのShadowing App</h1>
 
-<!-- Category Tabs -->
-<div class="category-bar" id="categoryBar"></div>
-
-<!-- Progress -->
-<div class="progress-bar-wrap">
-  <div class="progress-info">
-    <span id="progressLabel">1 / 10</span>
-    <span id="progressPct">0%</span>
-  </div>
-  <div class="progress-bar">
-    <div class="progress-fill" id="progressFill" style="width:0%"></div>
-  </div>
-</div>
-
-<div class="main" id="mainContent">
-
-  <!-- Sentence Card -->
-  <div class="card" id="sentenceCard">
-    <div class="scene-tag" id="sceneTag">Business</div>
-    <div class="phonetics" id="phonetics"></div>
-    <div class="sentence-en" id="sentenceEn">Loading...</div>
-    <button class="translate-btn" id="translateBtn" onclick="toggleTranslation()">
-      <span>🇯🇵</span> 日本語訳を見る
-    </button>
-    <div class="sentence-ja" id="sentenceJa"></div>
+  <div class="settings-toggle">
+    <a href="#" onclick="toggleSettings()">⚙️ APIキー設定</a>
   </div>
 
-  <!-- Listen Button -->
-  <div class="card" style="padding: 14px;">
-    <div class="controls">
-      <button class="btn btn-listen" id="listenBtn" onclick="playTTS()">
-        <span class="btn-icon">🔊</span>
-        <span>お手本を聞く</span>
-      </button>
-      <button class="btn btn-record" id="recordBtn" onclick="toggleRecording()">
-        <span class="btn-icon">🎤</span>
-        <span id="recordLabel">録音開始</span>
-      </button>
-      <button class="btn btn-play" id="playbackBtn" onclick="playRecording()" disabled>
-        <span class="btn-icon">▶️</span>
-        <span>自分の声</span>
-      </button>
+  <div class="container" id="settingsArea" style="display: none;">
+    <label for="apiKey">OpenAI API Key</label>
+    <input type="password" id="apiKey" placeholder="sk-...">
+    <button style="padding: 10px; background-color: #2ecc71; box-shadow: none;" onclick="saveApiKey()">保存</button>
+    <p style="font-size: 12px; color: #7f8c8d; margin-top: 10px;">※APIキーはブラウザ内にのみ安全に保存されます。</p>
+  </div>
+
+  <div class="container">
+    <label for="textInput">今日の英文</label>
+    <textarea id="textInput" placeholder="ここに英語のニュースや記事をペーストしてください..."></textarea>
+    <button id="generateBtn" onclick="generateAudio()">高音質AIで音声を生成</button>
+  </div>
+
+  <div class="container player-container" id="playerArea">
+    <label>再生コントロール</label>
+    <audio id="audioPlayer" controls></audio>
+    
+    <label style="margin-top: 12px;">再生速度</label>
+    <div class="speed-controls">
+      <button class="speed-btn" onclick="setSpeed(0.7, this)">0.7x</button>
+      <button class="speed-btn" onclick="setSpeed(0.8, this)">0.8x</button>
+      <button class="speed-btn active" onclick="setSpeed(1.0, this)">1.0x</button>
+      <button class="speed-btn" onclick="setSpeed(1.2, this)">1.2x</button>
     </div>
-    <div class="status-msg" id="statusMsg">👆 まずお手本を聞いてからシャドーイング！</div>
   </div>
 
-  <!-- Speed Control -->
-  <div class="speed-card" style="margin-bottom:14px;">
-    <div class="speed-label">
-      <span>🐢 再生速度</span>
-      <span class="speed-value" id="speedDisplay">1.0×</span>
-    </div>
-    <input type="range" class="speed-slider" id="speedSlider" min="0.5" max="1.5" step="0.1" value="1.0"
-      oninput="updateSpeed(this.value)">
-  </div>
+  <script>
+    const audioPlayer = document.getElementById('audioPlayer');
+    const settingsArea = document.getElementById('settingsArea');
+    const apiKeyInput = document.getElementById('apiKey');
 
-  <!-- Navigation -->
-  <div class="nav-row" style="margin-bottom:14px;">
-    <button class="btn-nav" onclick="prevSentence()">← 前へ</button>
-    <button class="btn-nav" onclick="nextSentence()" id="nextBtn">次へ →</button>
-  </div>
-
-  <!-- Tip -->
-  <div class="tip-box" id="tipBox">
-    <strong>💡 コツ：</strong> お手本を聞きながら、または直後に同じリズム・イントネーションで声に出しましょう。
-  </div>
-
-  <!-- Completion -->
-  <div class="completion-banner" id="completionBanner">
-    <h2>🎉 セット完了！</h2>
-    <p>全フレーズお疲れさまでした。<br>もう一度練習して定着させよう！</p>
-    <button class="btn-restart" onclick="restartSet()">もう一度チャレンジ</button>
-  </div>
-
-</div>
-
-<script>
-  // ===== DATA =====
-  const categories = {
-    "ビジネス": [
-      {
-        en: "Good morning, everyone. Thank you for joining today's project update meeting. I'd like to start by reviewing the progress we've made over the past two weeks. The development team has successfully completed the first phase of the project, and we're currently on track to meet our quarterly deadline. However, I do want to flag a potential issue with the budget. We've spent about sixty percent of our allocated funds, and we still have a significant amount of work remaining. I'd like to propose that we schedule a separate meeting with the finance team to discuss possible solutions. In the meantime, I'll prepare a detailed report outlining our current spending and projected costs. Does anyone have any questions or concerns before we move on to the next agenda item?",
-        ja: "おはようございます、皆さん。本日のプロジェクト進捗会議にご参加いただきありがとうございます。まず、この2週間の進捗を振り返りたいと思います。開発チームはプロジェクトの第一フェーズを無事完了し、現在四半期の締め切りに向けて順調に進んでいます。ただし、予算に関して懸念事項をお伝えしたいと思います。割り当て資金の約60%を使用しており、まだかなりの作業が残っています。財務チームと別途ミーティングを設けて、解決策を検討することを提案したいと思います。その間に、現在の支出と予測コストをまとめた詳細レポートを作成します。次の議題に移る前に、ご質問やご懸念はありますか？",
-        scene: "📊 Progress Meeting",
-        tip: "「I'd like to flag」は問題を注意喚起するビジネス表現。「on track」は「予定通り進んでいる」という意味。全体の流れを意識してリズムよく読もう。"
-      },
-      {
-        en: "Thank you for taking the time to meet with us today. We really appreciate the opportunity to present our proposal. As you can see from the slide, our solution is designed to address the key challenges your company has been facing. By implementing our software, you can expect to reduce operational costs by up to thirty percent within the first year. Additionally, our system integrates seamlessly with your existing infrastructure, which means there will be minimal disruption during the transition period. We've already helped several companies in your industry achieve similar results, and we're confident we can do the same for you. I'd be happy to walk you through a live demonstration after this presentation. Please feel free to ask any questions at any time.",
-        ja: "本日はお時間をいただきありがとうございます。提案をプレゼンする機会をいただき、大変感謝しております。スライドをご覧いただければわかるように、私たちのソリューションは貴社が直面している主要な課題に対応するために設計されています。私たちのソフトウェアを導入することで、初年度に運営コストを最大30%削減できることが期待できます。さらに、私たちのシステムは既存のインフラとシームレスに統合されるため、移行期間中の混乱は最小限に抑えられます。すでに御社と同じ業界の複数の企業が同様の成果を上げており、御社でも同じことができると確信しています。プレゼン後にライブデモを喜んでご案内します。ご質問はいつでもどうぞ。",
-        scene: "💼 Client Presentation",
-        tip: "「seamlessly integrates」や「minimal disruption」はIT・ビジネス提案でよく使うフレーズ。自信を持ったトーンで、強調する単語（costs、thirty percent など）を少し強めに読もう。"
-      },
-      {
-        en: "Thank you for the opportunity to interview for this position. I've been working in marketing for the past seven years, and I've developed strong skills in both digital and traditional marketing strategies. In my previous role at a mid-sized technology company, I led a team of eight people and was responsible for managing an annual marketing budget of approximately two million dollars. One of my proudest achievements was launching a social media campaign that increased brand awareness by forty percent in just three months. I'm particularly excited about this opportunity because your company's approach to customer engagement aligns perfectly with my professional values. I'm eager to bring my experience and passion to your team, and I'm confident that I can make a meaningful contribution from day one.",
-        ja: "このポジションへの面接の機会をいただきありがとうございます。私はこれまで7年間マーケティングの仕事をしており、デジタルと従来型のマーケティング戦略の両方で強いスキルを身につけてきました。以前の中規模テクノロジー企業での役割では、8人のチームをリードし、年間約200万ドルのマーケティング予算の管理を担当していました。最も誇りに思う成果の一つは、わずか3ヶ月でブランド認知度を40%向上させたソーシャルメディアキャンペーンを立ち上げたことです。御社のカスタマーエンゲージメントへのアプローチが私のプロとしての価値観と完全に一致しているため、この機会に特に興奮しています。経験と情熱をチームに持ち込みたいと思っており、初日から意義ある貢献ができると確信しています。",
-        scene: "🎯 Job Interview",
-        tip: "面接では自信あるトーンが大切。数字（seven years、forty percent）は明確に、「I'm confident that」は少し力を込めて言おう。"
-      },
-      {
-        en: "Good afternoon. Thank you for coming in today. As you know, we're here to discuss your performance over the past six months. Overall, I'm very pleased with the progress you've made. Your project management skills have improved significantly, and the feedback from your team members has been overwhelmingly positive. You've consistently met your deadlines, and the quality of your work has been excellent. However, there are a couple of areas where I'd like to see further development. First, I think you could improve your communication with other departments. There have been a few instances where information wasn't shared in a timely manner, which caused some delays. Second, I'd like you to take on more of a leadership role in client meetings. You have the skills, and I think it's time to put them to better use.",
-        ja: "こんにちは。本日はお越しいただきありがとうございます。ご存知の通り、この6ヶ月間のパフォーマンスについてお話しするためにお集まりいただきました。全体的に、あなたの成長にとても満足しています。プロジェクト管理スキルが大幅に向上し、チームメンバーからのフィードバックも非常にポジティブです。常に締め切りを守り、仕事の質も素晴らしいものがあります。ただ、さらなる成長を期待したい点が2つあります。まず、他部署とのコミュニケーションを改善できると思います。情報共有が遅れ、いくつかの遅延を引き起こした事例がありました。次に、クライアントミーティングでより主導的な役割を担っていただきたいと思います。スキルは十分にありますので、そろそろ活かす時期だと思います。",
-        scene: "📋 Performance Review",
-        tip: "人事評価の会話では、ポジティブな点を先に述べてから改善点に移る「サンドイッチ式」が定番。「However」や「I'd like to see」などの切り替えフレーズに注目しよう。"
-      },
-      {
-        en: "Thank you for sending over your proposal. We've had a chance to review it carefully, and while we're very interested in moving forward, there are a few points we'd like to discuss. First, regarding the pricing — the current rate is slightly above our budget for this quarter. We were hoping to bring the cost down by around fifteen percent. In exchange, we'd be happy to commit to a twelve-month contract rather than the six months originally discussed. Additionally, we'd like to include a service level agreement that guarantees a response time of no more than four hours for any critical issues. We believe these terms are fair for both sides and would allow us to build a strong long-term partnership. Would you be open to discussing these adjustments at your earliest convenience?",
-        ja: "提案書をお送りいただきありがとうございます。慎重に検討する機会を持ちましたが、前向きに進めることに大変関心があります。ただ、いくつか話し合いたい点があります。まず、価格設定について。現在の料金は今四半期の予算より若干高めです。約15%のコスト削減を希望しています。その代わり、当初の6ヶ月ではなく12ヶ月契約にコミットすることを喜んで検討します。さらに、重大な問題に対して4時間以内の対応時間を保証するサービスレベル契約を含めたいと思います。これらの条件は双方にとって公平であり、強固な長期的パートナーシップを構築できると確信しています。できるだけ早くこの調整について話し合う機会をいただけますか？",
-        scene: "🤝 Price Negotiation",
-        tip: "交渉では「条件提示→譲歩→見返り」のセットが基本。「In exchange」「Additionally」など話の流れを繋ぐ接続詞を意識して読もう。"
-      },
-      {
-        en: "Welcome aboard! We're really excited to have you joining our team. I'll be your onboarding buddy for the first few weeks, so please don't hesitate to ask me anything. Let me start with a quick overview of how things work here. Our team holds a stand-up meeting every morning at nine o'clock, which usually lasts about fifteen minutes. It's a great way to stay aligned and flag any blockers early in the day. You'll also be invited to our weekly all-hands meeting every Friday afternoon. For the first month, we'd like you to focus on getting familiar with our systems and processes. We've prepared a detailed onboarding document that should answer most of your questions. After that, we'll gradually introduce you to client projects. Do you have any questions before we get started?",
-        ja: "ようこそ！あなたがチームに加わることをとても嬉しく思います。最初の数週間はオンボーディングのサポート担当を務めますので、何でも遠慮なく聞いてください。まず、ここでの仕事の進め方を簡単に説明します。チームは毎朝9時にスタンドアップミーティングを開催しており、通常15分ほどです。足並みをそろえ、問題を早期に発見するのに最適な場です。毎週金曜の午後には全社ミーティングにも招待されます。最初の1ヶ月はシステムやプロセスに慣れることに集中していただきたいと思います。ほとんどの疑問に答えられる詳細なオンボーディング文書も用意しています。その後、徐々にクライアントプロジェクトにも関わっていただきます。始める前に何かご質問はありますか？",
-        scene: "🌟 Onboarding",
-        tip: "新入社員のオンボーディング会話は温かく明確なトーンが大切。「don't hesitate to」「gradually」などのフレーズは職場英語の定番。リズムよく読もう。"
-      }
-    ],
-    "旅行": [
-      {
-        en: "Good afternoon. I'd like to check in for my flight to London, please. My name is Yamamoto, and here is my passport. Yes, I have one suitcase to check in and one carry-on bag. I'd prefer a window seat if one is available, please. Actually, I was also wondering if there's any possibility of an upgrade to business class. I understand if that's not possible. Could you also tell me which gate my flight will be departing from? And approximately how long will it take to get through security from here? I ask because I'd like to grab something to eat before boarding. Also, I notice my boarding pass says the flight departs at two fifteen. Is that still the scheduled departure time, or has there been any delay?",
-        ja: "こんにちは。ロンドン行きのフライトにチェックインしたいのですが。山本と申します、こちらがパスポートです。はい、預け荷物が1個と機内持ち込み荷物が1個あります。もし席が空いていれば窓側の席をお願いしたいです。また、ビジネスクラスへのアップグレードの可能性はありますか？難しければ大丈夫です。フライトはどのゲートから出発するか教えていただけますか？また、ここからセキュリティチェックを通過するのにどのくらいかかりますか？搭乗前に何か食べたいので確認しておきたいのです。それと、搭乗券に2時15分出発とあるのですが、これは予定通りの出発時刻ですか、それとも遅延はありますか？",
-        scene: "✈️ Airport Check-in",
-        tip: "空港での会話は次々と質問が連なるのが特徴。「I was wondering if」は丁寧な質問の前置き。流れを切らずにスムーズに読む練習をしよう。"
-      },
-      {
-        en: "Hello. I have a reservation for a rental car under the name Yamamoto. I booked online last week and I have my confirmation number here. I reserved a medium-sized sedan, but I was wondering if you have any larger vehicles available for a similar price. I'll be travelling with three other people and we have quite a bit of luggage. Also, I'd like to ask about the insurance options. My credit card usually covers basic rental insurance, but I want to make sure I have adequate coverage. Could you explain the difference between the basic and the comprehensive package? And one more thing — I'll be returning the car at a different location. I booked a one-way rental, so I'll be dropping it off at the airport branch at the end of my trip. Is everything in order with my booking?",
-        ja: "こんにちは。山本という名前でレンタカーの予約をしています。先週オンラインで予約し、確認番号を持っています。中型セダンを予約しましたが、同様の価格でより大きな車はありますか？3人と一緒に移動する予定で、荷物もかなりあります。また、保険の選択肢についても伺いたいのですが。私のクレジットカードは通常、基本的なレンタル保険をカバーしていますが、十分な補償があるか確認したいです。基本プランと総合プランの違いを説明していただけますか？もう一点、車は別の場所で返却します。片道レンタルを予約しているので、旅行の終わりに空港の支店で返却する予定です。予約は問題ありませんか？",
-        scene: "🚗 Car Rental",
-        tip: "レンタカーの手続きは「確認→追加要望→保険→特記事項」の流れが多い。「I was wondering if」で丁寧に要望を伝え、最後に「Is everything in order?」で確認するのが自然。"
-      },
-      {
-        en: "Excuse me. I'm trying to get to Heathrow Airport, and I'm not quite sure which train to take. I've been looking at the board, but there seem to be several different options and I'm not sure which is fastest. My flight departs at three thirty in the afternoon, and I need to be at the airport at least two hours before boarding. Could you help me figure out which train I should take? Oh, I see. So the Heathrow Express is the quickest option, but more expensive. And the Piccadilly line takes about fifty minutes but is cheaper. Given my time, which would you recommend? I think I'll go with the Express to be safe. Could you point me toward the platform? And do you know if I can buy a ticket here with a credit card, or do I need cash?",
-        ja: "すみません。ヒースロー空港に行こうとしているのですが、どの電車に乗ればいいかよくわかりません。案内板を見ていたのですが、いくつかの選択肢があり、どれが一番早いか分かりません。フライトは午後3時30分出発で、搭乗の少なくとも2時間前には空港に着いている必要があります。どの電車に乗れば良いか教えていただけますか？なるほど。ヒースローエクスプレスが最も早いけど高い。ピカデリーラインは約50分かかるけど安い、ということですね。時間を考えると、どちらがおすすめですか？安全を見てエクスプレスにします。ホームはどこですか？クレジットカードで切符を買えますか、それとも現金が必要ですか？",
-        scene: "🚇 Train to Airport",
-        tip: "電車の乗り方を聞く場面。状況説明→具体的な質問→提案に対する確認が自然な流れ。「to be safe」は「念のため」という意味の便利な表現。"
-      },
-      {
-        en: "Good morning. I was hoping you could help me plan my day. I only have one full day in the city before I fly home tomorrow, and I really want to make the most of it. I'm particularly interested in history and art, so I'd love to visit a museum or two. Which would you recommend for someone with only a few hours? Oh, the National Museum sounds wonderful. Is it within walking distance from here? And is there anything nearby also worth visiting — perhaps a historic building or a park? I'd also like to find somewhere good for lunch — somewhere that serves authentic local food rather than tourist traps. And finally, could you tell me when the main shopping area closes? I'd like to do some shopping in the evening before dinner.",
-        ja: "おはようございます。今日の計画を立てるのを手伝っていただければ嬉しいのですが。明日帰国するので、この街で過ごせる時間は今日一日だけです。最大限に活用したいと思っています。特に歴史と芸術に興味があるので、美術館や博物館を1〜2か所訪れたいと思っています。数時間しかない人にはどこをおすすめしますか？国立博物館ですか、素晴らしそうですね。ここから歩いて行けますか？近くに他にも見る価値のある場所はありますか？例えば歴史的な建物や公園など。ランチに良い場所も探したいのですが、観光客向けではなく、地元の本物の料理が食べられるところがいいです。最後に、メインのショッピングエリアは何時まで開いていますか？夕食前に少し買い物をしたいと思っています。",
-        scene: "🏛️ Tourist Planning",
-        tip: "観光案内所での会話は「目的の説明→具体的な質問×複数」の積み重ね。「I was hoping you could」は丁寧な依頼の前置き。自然な好奇心のトーンで読もう。"
-      },
-      {
-        en: "Excuse me. I checked in about an hour ago, and I'm having a few issues with my room that I'd like to report. First of all, the air conditioning doesn't seem to be working properly. It's making a very loud noise, and the room isn't cooling down at all. I also noticed that the hot water in the shower takes quite a long time to come through. I understand these things can happen, but I was wondering if it would be possible to move to a different room. I have an important business meeting tomorrow morning, so I really need to get a good night's sleep. If changing rooms isn't an option, could you please send someone up to check the air conditioning as soon as possible? I'd really appreciate your help with this.",
-        ja: "すみません。約1時間前にチェックインしたのですが、部屋でいくつか問題が発生しているのでご報告したいと思います。まず、エアコンがうまく動いていないようです。とても大きな音がしていて、部屋が全く冷えません。また、シャワーのお湯が出るまでかなり時間がかかることにも気づきました。こういうことは起こりうると理解していますが、別の部屋に移ることは可能でしょうか？明日の朝に重要なビジネスミーティングがあるので、ぐっすり眠れる必要があります。部屋の変更が難しい場合は、できるだけ早くエアコンを確認する人を送っていただけますか？ご対応よろしくお願いします。",
-        scene: "🏨 Hotel Complaint",
-        tip: "クレームを伝えるときは丁寧さを保ちながら具体的に。「I was wondering if」でソフトに依頼し、「I'd really appreciate」で締めくくるのが自然な流れ。"
-      },
-      {
-        en: "Good evening. I have a reservation for two people at seven thirty. The name is Yamamoto. Thank you. Could we have a table by the window if possible? That would be lovely. Now, I was wondering if you could help me with the menu. My friend is vegetarian, so I'd like to know which dishes don't contain any meat or fish. I see, thank you. And are there any dishes you would personally recommend tonight? The pasta sounds wonderful. I think we'll start with the soup of the day and the mixed salad to share. For the main course, I'll have the grilled salmon, and my friend would like the mushroom risotto. Could we also have a bottle of still water for the table? And may I see the wine list, please?",
-        ja: "こんばんは。7時30分に2名で予約しています。山本と申します。ありがとうございます。可能であれば窓際のテーブルにできますか？素晴らしいですね。メニューについて教えていただけますか？友人がベジタリアンなので、肉や魚が入っていない料理を知りたいのですが。なるほど、ありがとうございます。今夜特におすすめの料理はありますか？パスタが美味しそうですね。まず本日のスープとミックスサラダをシェアして前菜にしたいと思います。メインコースは私がグリルサーモン、友人はマッシュルームリゾットをいただきます。テーブルにスティルウォーターのボトルもいただけますか？それとワインリストを見せていただけますか？",
-        scene: "🍽️ Restaurant Ordering",
-        tip: "レストランでの会話は自然な「流れ」が大事。要望→感謝→次の質問のリズムを意識しよう。「Could we」「May I」は丁寧な依頼の定番。"
-      }
-    ],
-    "日常会話": [
-      {
-        en: "Hey, it's so great to see you! It feels like it's been forever since we last caught up. I've been meaning to call you, but work has been absolutely crazy lately. We just launched a new product line, and everything has been moving so fast. But enough about me — how have you been? I heard you moved to a new apartment. How's that going? Oh, that's great! Is it closer to your office? You know, we should really make more of an effort to meet up more regularly. There's that new Italian restaurant that just opened near the station. I've heard the food is amazing. Maybe we could go there next week? Or if you're free this weekend, a few of us are getting together for a hike. You should totally come!",
-        ja: "やあ、会えて本当に嬉しい！最後に話してからずいぶん経った気がするね。電話しようと思っていたんだけど、最近仕事がとにかく忙しくて。新しい製品ラインをちょうど立ち上げたところで、すべてが猛スピードで動いているんだ。でも私の話はこのくらいにして、あなたはどうしてた？新しいアパートに引っ越したって聞いたけど、どう？そうか、良かった！職場には近くなった？ねえ、もっと定期的に会う努力をしなきゃだね。駅の近くに新しいイタリアンレストランがオープンしたんだけど、食事が最高だって聞いたよ。来週行けるかな？それか今週末が空いてたら、何人かでハイキングに行くんだけど、ぜひ来てよ！",
-        scene: "👋 Catching Up",
-        tip: "友人との会話は感情の起伏が大事。「it's been forever」「absolutely crazy」など感情を込めた表現が多い。元気よく、自然なテンポで話すのが目標。"
-      },
-      {
-        en: "Excuse me, I'm sorry to bother you, but I was wondering if you could help me. I'm trying to get to the Central Museum, but I think I might have taken a wrong turn somewhere. My map says it should only be about a ten minute walk from the train station, but I've been walking for almost twenty minutes now and I can't seem to find it. Do you know where it is by any chance? Oh, I see. So I need to go back to the main road and turn left at the traffic lights? And then it's the large building on the right, just past the bookstore? That's very helpful, thank you so much. Actually, one more question — do you happen to know if the museum is open on Mondays? I'd hate to walk all that way and find it closed.",
-        ja: "すみません、お邪魔してすみませんが、ちょっと助けていただけますか？セントラル博物館に行こうとしているのですが、どこかで道を間違えてしまったようです。地図では駅から徒歩10分ほどのはずなのですが、もう20分近く歩いているのに見つかりません。もしかして場所をご存知ですか？なるほど。大通りに戻って信号を左折すればいいのですね？それで右手の本屋の少し先の大きな建物ですか？とても参考になりました、ありがとうございます。あと一つだけ質問してもいいですか？博物館は月曜日も開いているかどうかご存知ですか？せっかく歩いて閉まっていたら残念なので。",
-        scene: "🗺️ Asking Directions",
-        tip: "道を聞く会話は「状況説明→質問→確認→お礼→追加質問」の流れが自然。「by any chance」はソフトな聞き方。相手の返答を想定しながら読もう。"
-      },
-      {
-        en: "I haven't been feeling well for the past few days, and I'm starting to get a little worried. It started on Monday with a sore throat, and then by Tuesday I had a fever and a really bad headache. I thought it might just be a cold, so I tried to rest and drink plenty of fluids, but it doesn't seem to be getting any better. I also noticed that my throat is quite swollen, which made me think it might be more than just a cold. My friend suggested I should go see a doctor, but I'm not sure if it's serious enough for that. Have you ever had similar symptoms? What would you do in my situation? Should I make an appointment, or do you think it will clear up on its own in a few more days?",
-        ja: "ここ数日体調がすぐれなくて、少し心配になってきました。月曜に喉の痛みから始まり、火曜には発熱とひどい頭痛が出てきました。ただの風邪かと思って、安静にして水分をたくさん取るようにしていたのですが、なかなか良くなりません。喉もかなり腫れていて、ただの風邪以上のものかもしれないと感じています。友人は医者に行くべきだと言っていますが、それほど深刻かどうかわかりません。似たような症状を経験したことがありますか？私の立場だったらどうしますか？診察の予約を取るべきか、それともあと数日で自然に治ると思いますか？",
-        scene: "🤒 Health / Symptoms",
-        tip: "体調について話すときは「いつから→症状→対処→現状」の時系列で話すのが自然。「it doesn't seem to be getting better」など否定形の進行表現も練習しよう。"
-      },
-      {
-        en: "I've been thinking about taking a trip this summer, and I was wondering if you'd be interested in coming along. I was looking at a few different options online. One idea is a road trip along the coast — we could rent a car, drive for about a week, and stop at different towns along the way. The other option is to fly somewhere farther away, maybe Japan or Southeast Asia. I've always wanted to go to Kyoto, and I've heard the food scene in Bangkok is absolutely incredible. Obviously the budget would be quite different for each option, so that's something we'd need to figure out together. What do you think? Do you have any time off in July or August? And is there anywhere you've always dreamed of visiting?",
-        ja: "今年の夏にどこか旅行しようかと思っていて、一緒に来ませんかと思っていました。オンラインでいくつかの選択肢を調べていました。一つはドライブ旅行で、車を借りて1週間ほど海岸線を走り、沿岸の町々に立ち寄るというもの。もう一つは、もっと遠くに飛行機で行く案で、日本や東南アジアなどが良いかと。ずっと京都に行きたかったし、バンコクの食のシーンは本当に素晴らしいと聞いています。もちろん予算が大分違ってくるので、一緒に検討する必要があります。どう思いますか？7月か8月に休みは取れそうですか？それと、ずっと行ってみたかった場所はありますか？",
-        scene: "✈️ Trip Planning",
-        tip: "旅行の提案会話では「提案→選択肢の説明→相手への質問」という流れが自然。「I've always wanted to」は夢や憧れを語るときの定番表現。"
-      },
-      {
-        en: "Hi, I'm so sorry to knock on your door like this. I'm your neighbor from the apartment just below yours, and I was hoping we could have a quick chat. I don't want to make this awkward, and I'm not trying to cause any trouble. But I've been noticing quite a bit of noise coming from your apartment late at night, particularly on weekends. I completely understand that you have every right to enjoy your home, and I'm not trying to be unreasonable. But I have to be up quite early for work on weekdays, and it's been making it really difficult for me to sleep. I was wondering if we could perhaps come to some kind of arrangement — maybe keeping the noise down after eleven on weeknights? I'd really appreciate your understanding.",
-        ja: "こんにちは、突然ドアをノックして本当に申し訳ありません。すぐ下の階に住んでいる者です。少しお話しできればと思ってきました。気まずくさせたいわけではなく、問題を起こしたいわけでもありません。ただ、特に週末の深夜に、お部屋からかなりの騒音が聞こえることが続いています。ご自宅で楽しむ権利があることは十分理解しており、無理なことを言うつもりもありません。ただ、平日はかなり早起きする必要があるため、なかなか眠れない日が続いています。何か取り決めができればと思っているのですが、例えば平日の夜11時以降は少し音を抑えていただけると助かります。ご理解いただけると大変ありがたいです。",
-        scene: "🏠 Neighbor Request",
-        tip: "デリケートな依頼をするときは「共感を示しながら」話すのがポイント。「I completely understand」「I'm not trying to」で相手を尊重しつつ、自分の状況をていねいに伝えよう。"
-      },
-      {
-        en: "Hi there. I bought this jacket here about a week ago, and unfortunately I need to return it. I still have the original receipt, and the tags are still attached. The main reason I'd like to return it is that when I got home and tried it on in natural light, I realized the color wasn't quite what I expected. It looked much darker in the store. Also, I think the size might be slightly too large for me. I was wondering if it would be possible to exchange it for the same style in a different color and a smaller size. Alternatively, if you don't have the color I'm looking for in stock, I'd like to get a full refund. I paid by credit card, so I assume the refund would go back to my card. How would you like to proceed?",
-        ja: "こんにちは。先週こちらでこのジャケットを購入したのですが、残念ながら返品したいと思っています。元のレシートはまだ持っていて、タグも付いたままです。返品したい主な理由は、家に帰って自然光の中で着てみたら、色が思っていたのと少し違うと気づいたからです。お店の中ではもっと暗く見えました。また、サイズも少し大きすぎるかもしれません。同じスタイルで別の色とワンサイズ小さいものと交換することは可能でしょうか？もし探している色が在庫にない場合は、全額返金をお願いしたいと思います。クレジットカードで支払ったので、返金はカードに戻ると思いますが。どのように対応していただけますか？",
-        scene: "🛍️ Return / Exchange",
-        tip: "返品交渉では「状況説明→理由→希望→代替案」の順が伝わりやすい。「alternatively」は代替案を出すときの便利な接続詞。落ち着いた丁寧なトーンで。"
-      }
-    ]
-  };
-
-  // ===== STATE =====
-  let currentCat = "ビジネス";
-  let currentIdx = 0;
-  let sentences = [];
-  let speechSpeed = 1.0;
-  let mediaRecorder = null;
-  let audioChunks = [];
-  let recordedBlob = null;
-  let recordedUrl = null;
-  let isRecording = false;
-  let isSpeaking = false;
-  let currentAudio = null;
-  let chunkQueue = [];
-
-  // ===== INIT =====
-  function init() {
-    buildCategoryTabs();
-    loadCategory("ビジネス");
-  }
-
-  function buildCategoryTabs() {
-    const bar = document.getElementById("categoryBar");
-    bar.innerHTML = "";
-    Object.keys(categories).forEach(cat => {
-      const btn = document.createElement("button");
-      btn.className = "cat-btn" + (cat === currentCat ? " active" : "");
-      btn.textContent = cat;
-      btn.onclick = () => loadCategory(cat);
-      bar.appendChild(btn);
-    });
-  }
-
-  function loadCategory(cat) {
-    currentCat = cat;
-    currentIdx = 0;
-    sentences = categories[cat];
-    // Update tab styles
-    document.querySelectorAll(".cat-btn").forEach(b => {
-      b.classList.toggle("active", b.textContent === cat);
-    });
-    document.getElementById("completionBanner").classList.remove("show");
-    document.getElementById("sentenceCard").style.display = "";
-    clearRecording();
-    renderSentence();
-  }
-
-  function renderSentence() {
-    if (currentIdx >= sentences.length) {
-      showCompletion();
-      return;
-    }
-    const s = sentences[currentIdx];
-    document.getElementById("sceneTag").textContent = s.scene;
-    document.getElementById("phonetics").textContent = s.phonetics || "";
-    document.getElementById("sentenceEn").textContent = s.en;
-    document.getElementById("sentenceJa").textContent = s.ja;
-    document.getElementById("sentenceJa").classList.remove("show");
-    document.getElementById("translateBtn").innerHTML = '<span>🇯🇵</span> 日本語訳を見る';
-    document.getElementById("tipBox").innerHTML = `<strong>💡 コツ：</strong> ${s.tip}`;
-    updateProgress();
-    clearRecording();
-    setStatus("👆 まずお手本を聞いてからシャドーイング！", "");
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  function updateProgress() {
-    const total = sentences.length;
-    const done = currentIdx;
-    const pct = Math.round((done / total) * 100);
-    document.getElementById("progressLabel").textContent = `${done + 1} / ${total}`;
-    document.getElementById("progressPct").textContent = `${pct}%`;
-    document.getElementById("progressFill").style.width = pct + "%";
-  }
-
-  // ===== TTS =====
-  // 方法1（最優先）: Google TTS → 自然な音声・センテンス単位で区切り
-  // 方法2（フォールバック）: speechSynthesis + iOSの高品質ボイス自動選択
-
-  let bestVoice = null;
-
-  function initVoice() {
-    if (!window.speechSynthesis) return;
-    const voices = window.speechSynthesis.getVoices();
-    if (!voices.length) return;
-    const en = voices.filter(v => v.lang && v.lang.startsWith('en'));
-    bestVoice =
-      en.find(v => /enhanced|premium|neural/i.test(v.name) && v.lang === 'en-US') ||
-      en.find(v => /enhanced|premium|neural/i.test(v.name)) ||
-      en.find(v => v.lang === 'en-US') ||
-      en[0] || null;
-  }
-  if (window.speechSynthesis) {
-    initVoice();
-    window.speechSynthesis.addEventListener('voiceschanged', initVoice);
-  }
-
-  // センテンス単位でテキストを分割（句点・疑問符・感嘆符）
-  function buildSentenceChunks(text, maxLen) {
-    const raw = text.match(/[^.!?]+[.!?]+\s*/g) || [text];
-    const chunks = [];
-    let cur = '';
-    for (const sent of raw) {
-      if ((cur + sent).length <= maxLen) {
-        cur += sent;
+    // 起動時にAPIキーを復元
+    window.onload = () => {
+      const savedKey = localStorage.getItem('openai_api_key');
+      if (savedKey) {
+        apiKeyInput.value = savedKey;
       } else {
-        if (cur) chunks.push(cur.trim());
-        cur = sent.length > maxLen ? sent : sent;
+        settingsArea.style.display = 'block';
+      }
+    };
+
+    function toggleSettings() {
+      settingsArea.style.display = settingsArea.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function saveApiKey() {
+      const key = apiKeyInput.value.trim();
+      if (key) {
+        localStorage.setItem('openai_api_key', key);
+        alert('APIキーを保存しました！');
+        settingsArea.style.display = 'none';
       }
     }
-    if (cur) chunks.push(cur.trim());
-    return chunks.filter(c => c.length > 0);
-  }
 
-  function playTTS() {
-    const btn = document.getElementById("listenBtn");
+    async function generateAudio() {
+      const text = document.getElementById('textInput').value.trim();
+      const apiKey = localStorage.getItem('openai_api_key');
+      const btn = document.getElementById('generateBtn');
 
-    if (isSpeaking) {
-      isSpeaking = false;
-      chunkQueue = [];
-      if (currentAudio) { currentAudio.pause(); currentAudio.src = ""; }
-      if (window.speechSynthesis) window.speechSynthesis.cancel();
-      btn.innerHTML = '<span class="btn-icon">🔊</span><span>お手本を聞く</span>';
-      setStatus("⏹ 停止しました", "");
-      return;
-    }
-
-    const s = sentences[currentIdx];
-    isSpeaking = true;
-    btn.innerHTML = '<span class="btn-icon">⏸️</span><span>再生中...</span>';
-    setStatus("🎧 音声を聞いています...", "");
-
-    // speechSynthesis（iOS Safari確認済・ユーザーのタップから直接呼ぶ）
-    playWithSpeechSynthesis(s.en);
-  }
-
-  // ── speechSynthesis + センテンス単位区切り + 高品質ボイス自動選択 ──
-  function playWithSpeechSynthesis(text) {
-    if (!window.speechSynthesis) {
-      isSpeaking = false;
-      document.getElementById("listenBtn").innerHTML = '<span class="btn-icon">🔊</span><span>お手本を聞く</span>';
-      setStatus("⚠️ 音声エラー。ネット接続を確認してください", "err");
-      return;
-    }
-    window.speechSynthesis.cancel();
-    const chunks = buildSentenceChunks(text, 200);
-    let idx = 0;
-    function next() {
-      if (!isSpeaking || idx >= chunks.length) {
-        if (isSpeaking) {
-          isSpeaking = false;
-          document.getElementById("listenBtn").innerHTML = '<span class="btn-icon">🔊</span><span>お手本を聞く</span>';
-          setStatus("✅ 聞けた！今度は自分でシャドーイング🎤", "ok");
-        }
+      if (!apiKey) {
+        alert('右上の「⚙️ APIキー設定」からOpenAIのAPIキーを登録してください。');
+        toggleSettings();
         return;
       }
-      const utter = new SpeechSynthesisUtterance(chunks[idx]);
-      utter.lang = "en-US";
-      utter.rate = Math.min(Math.max(speechSpeed, 0.5), 2.0);
-      if (bestVoice) utter.voice = bestVoice;
-      if (idx === 0) utter.onstart = () => setStatus("🎧 音声を聞いています...", "");
-      utter.onend = () => { idx++; next(); };
-      utter.onerror = () => {
-        isSpeaking = false;
-        document.getElementById("listenBtn").innerHTML = '<span class="btn-icon">🔊</span><span>お手本を聞く</span>';
-        setStatus("⚠️ 音声エラー", "err");
-      };
-      window.speechSynthesis.speak(utter);
-    }
-    next();
-  }
+      if (!text) {
+        alert('英文を入力してください。');
+        return;
+      }
 
-  // ===== RECORDING =====
-  async function toggleRecording() {
-    if (isRecording) {
-      stopRecording();
-    } else {
-      await startRecording();
-    }
-  }
+      // ボタンをローディング状態に
+      btn.disabled = true;
+      btn.textContent = '音声を生成中... (数秒かかります)';
 
-  // iOS fix: detect supported audio MIME type
-  function getSupportedMimeType() {
-    if (typeof MediaRecorder === "undefined") return null;
-    const types = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg", ""];
-    for (const type of types) {
       try {
-        if (type === "" || MediaRecorder.isTypeSupported(type)) return type;
-      } catch(e) {}
+        const response = await fetch('https://api.openai.com/v1/audio/speech', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: 'tts-1',
+            voice: 'nova', // 非常に自然で聴きやすい女性の声
+            input: text
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('APIエラー: キーが間違っているか、利用上限の可能性があります。');
+        }
+
+        const blob = await response.blob();
+        const audioUrl = URL.createObjectURL(blob);
+        
+        audioPlayer.src = audioUrl;
+        document.getElementById('playerArea').style.display = 'block';
+        
+        // 自動再生
+        audioPlayer.play();
+
+      } catch (error) {
+        alert(error.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '高音質AIで音声を生成';
+      }
     }
-    return "";
-  }
 
-  async function startRecording() {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      audioChunks = [];
-      const mimeType = getSupportedMimeType();
-      const options = mimeType ? { mimeType } : {};
-      mediaRecorder = new MediaRecorder(stream, options);
-      mediaRecorder.ondataavailable = e => {
-        if (e.data.size > 0) audioChunks.push(e.data);
-      };
-      const actualType = mimeType || "audio/webm";
-      mediaRecorder.onstop = () => {
-        recordedBlob = new Blob(audioChunks, { type: actualType });
-        recordedUrl = URL.createObjectURL(recordedBlob);
-        document.getElementById("playbackBtn").disabled = false;
-        setStatus("✅ 録音完了！▶️ 自分の声を確認しよう", "ok");
-        stream.getTracks().forEach(t => t.stop());
-      };
-      mediaRecorder.start();
-      isRecording = true;
-      const btn = document.getElementById("recordBtn");
-      btn.classList.add("recording");
-      document.getElementById("recordLabel").textContent = "録音中...";
-      setStatus("🔴 録音中... もう一度タップで停止", "");
-    } catch(e) {
-      setStatus("⚠️ マイクへのアクセスを許可してください", "err");
+    function setSpeed(rate, btnElement) {
+      audioPlayer.playbackRate = rate;
+      
+      // ボタンのアクティブ状態を切り替え
+      document.querySelectorAll('.speed-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      btnElement.classList.add('active');
     }
-  }
-
-  function stopRecording() {
-    if (mediaRecorder && mediaRecorder.state !== "inactive") {
-      mediaRecorder.stop();
-    }
-    isRecording = false;
-    const btn = document.getElementById("recordBtn");
-    btn.classList.remove("recording");
-    document.getElementById("recordLabel").textContent = "録音開始";
-  }
-
-  function playRecording() {
-    if (!recordedUrl) return;
-    const audio = new Audio(recordedUrl);
-    audio.play();
-    setStatus("▶️ あなたの録音を再生中...", "");
-    audio.onended = () => setStatus("💬 お手本と比べてみよう！", "ok");
-  }
-
-  function clearRecording() {
-    isRecording = false;
-    audioChunks = [];
-    recordedBlob = null;
-    if (recordedUrl) {
-      URL.revokeObjectURL(recordedUrl);
-      recordedUrl = null;
-    }
-    const btn = document.getElementById("recordBtn");
-    btn.classList.remove("recording");
-    document.getElementById("recordLabel").textContent = "録音開始";
-    document.getElementById("playbackBtn").disabled = true;
-    if (mediaRecorder && mediaRecorder.state !== "inactive") {
-      mediaRecorder.stop();
-    }
-    mediaRecorder = null;
-  }
-
-  // ===== TRANSLATION =====
-  function toggleTranslation() {
-    const ja = document.getElementById("sentenceJa");
-    const btn = document.getElementById("translateBtn");
-    if (ja.classList.contains("show")) {
-      ja.classList.remove("show");
-      btn.innerHTML = '<span>🇯🇵</span> 日本語訳を見る';
-    } else {
-      ja.classList.add("show");
-      btn.innerHTML = '<span>🙈</span> 日本語訳を隠す';
-    }
-  }
-
-  // ===== SPEED =====
-  function updateSpeed(val) {
-    speechSpeed = parseFloat(val);
-    document.getElementById("speedDisplay").textContent = speechSpeed.toFixed(1) + "×";
-    if (currentAudio) currentAudio.playbackRate = speechSpeed;
-  }
-
-  // ===== NAVIGATION =====
-  function cancelSpeech() {
-    isSpeaking = false;
-    chunkQueue = [];
-    if (currentAudio) { currentAudio.pause(); currentAudio.src = ""; }
-    if (window.speechSynthesis) window.speechSynthesis.cancel();
-    const btn = document.getElementById("listenBtn");
-    if (btn) btn.innerHTML = '<span class="btn-icon">🔊</span><span>お手本を聞く</span>';
-  }
-
-  function nextSentence() {
-    cancelSpeech();
-    if (currentIdx < sentences.length - 1) {
-      currentIdx++;
-      renderSentence();
-    } else {
-      showCompletion();
-    }
-  }
-
-  function prevSentence() {
-    cancelSpeech();
-    if (currentIdx > 0) {
-      currentIdx--;
-      renderSentence();
-    }
-  }
-
-  function showCompletion() {
-    document.getElementById("sentenceCard").style.display = "none";
-    document.getElementById("completionBanner").classList.add("show");
-    document.getElementById("progressFill").style.width = "100%";
-    document.getElementById("progressPct").textContent = "100%";
-  }
-
-  function restartSet() {
-    currentIdx = 0;
-    document.getElementById("completionBanner").classList.remove("show");
-    document.getElementById("sentenceCard").style.display = "";
-    renderSentence();
-  }
-
-  // ===== UTIL =====
-  function setStatus(msg, type) {
-    const el = document.getElementById("statusMsg");
-    el.textContent = msg;
-    el.className = "status-msg" + (type ? " " + type : "");
-  }
-
-  // Start
-  init();
-</script>
+  </script>
 </body>
 </html>

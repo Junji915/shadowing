@@ -3,193 +3,266 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>ジュンジのShadowing App</title>
+  <title>English Shadowing Master</title>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: #f0f4f8;
+      background-color: #f4f6f8;
       color: #333;
-      padding: 20px;
       margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
     }
-    h1 {
-      font-size: 22px;
-      text-align: center;
-      color: #2c3e50;
-      margin-bottom: 20px;
+    .header-bar {
+      background-color: #34495e;
+      color: #fff;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      z-index: 10;
     }
-    .container {
-      background: #ffffff;
+    .header-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #ecf0f1;
+    }
+    .export-btn {
+      background-color: #27ae60;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .export-btn:active {
+      background-color: #219653;
+    }
+    .main-container {
+      flex: 1;
       padding: 20px;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      overflow-y: auto;
     }
-    label {
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .input-label {
       font-size: 14px;
       font-weight: bold;
       color: #7f8c8d;
-      display: block;
       margin-bottom: 8px;
+      display: block;
     }
     textarea {
       width: 100%;
-      height: 150px;
+      height: 100px;
       padding: 12px;
-      border: 1px solid #bdc3c7;
-      border-radius: 12px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 8px;
       font-size: 16px;
-      box-sizing: border-box;
       resize: none;
-      margin-bottom: 16px;
-      font-family: inherit;
+      outline: none;
     }
-    input[type="password"] {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #bdc3c7;
-      border-radius: 12px;
-      font-size: 14px;
-      box-sizing: border-box;
-      margin-bottom: 16px;
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
     }
-    button {
-      width: 100%;
-      padding: 16px;
+    .action-btn {
+      flex: 1;
       background-color: #3498db;
       color: white;
       border: none;
-      border-radius: 12px;
-      font-size: 16px;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 15px;
       font-weight: bold;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
-      transition: background-color 0.2s;
     }
-    button:active {
-      background-color: #2980b9;
-    }
-    button:disabled {
+    .action-btn.secondary {
       background-color: #95a5a6;
-      box-shadow: none;
-      cursor: not-allowed;
     }
-    .player-container {
-      margin-top: 20px;
-      display: none; /* 音声生成後に表示 */
+    .action-btn:active {
+      opacity: 0.9;
     }
-    audio {
-      width: 100%;
-      margin-bottom: 12px;
-    }
-    .speed-controls {
+    .result-section {
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
       gap: 10px;
     }
-    .speed-btn {
-      background-color: #ecf0f1;
+    .text-display {
+      font-size: 18px;
+      line-height: 1.5;
+      font-weight: 500;
       color: #2c3e50;
-      box-shadow: none;
-      padding: 10px;
-      font-size: 14px;
+      background: #fdfefe;
+      padding: 15px;
+      border-radius: 8px;
+      border-left: 5px solid #3498db;
     }
-    .speed-btn.active {
-      background-color: #3498db;
-      color: white;
+    .translation-box {
+      font-size: 15px;
+      line-height: 1.5;
+      color: #27ae60;
+      background: #ebf7ee;
+      padding: 12px;
+      border-radius: 8px;
+      border-left: 5px solid #27ae60;
     }
-    .settings-toggle {
-      text-align: right;
-      margin-bottom: 10px;
+    .settings-area {
+      background: #fff;
+      padding: 15px;
+      border-bottom: 1px solid #ddd;
     }
-    .settings-toggle a {
-      color: #95a5a6;
-      font-size: 13px;
-      text-decoration: none;
+    .settings-area input {
+      width: calc(100% - 80px);
+      padding: 8px;
+      margin-right: 10px;
     }
   </style>
 </head>
 <body>
 
-  <h1>ジュンジのShadowing App</h1>
-
-  <div class="settings-toggle">
-    <a href="#" onclick="toggleSettings()">⚙️ APIキー設定</a>
+  <div class="settings-area" id="settingsArea" style="display: none;">
+    <input type="password" id="apiKey" placeholder="OpenAI API Key (sk-...)">
+    <button onclick="saveApiKey()">保存</button>
   </div>
 
-  <div class="container" id="settingsArea" style="display: none;">
-    <label for="apiKey">OpenAI API Key</label>
-    <input type="password" id="apiKey" placeholder="sk-...">
-    <button style="padding: 10px; background-color: #2ecc71; box-shadow: none;" onclick="saveApiKey()">保存</button>
-    <p style="font-size: 12px; color: #7f8c8d; margin-top: 10px;">※APIキーはブラウザ内にのみ安全に保存されます。</p>
+  <div class="header-bar">
+    <div class="header-title">🗣️ Shadowing Master</div>
+    <button class="export-btn" onclick="exportHistory()">📊 Export</button>
   </div>
 
-  <div class="container">
-    <label for="textInput">今日の英文</label>
-    <textarea id="textInput" placeholder="ここに英語のニュースや記事をペーストしてください..."></textarea>
-    <button id="generateBtn" onclick="generateAudio()">高音質AIで音声を生成</button>
-  </div>
-
-  <div class="container player-container" id="playerArea">
-    <label>再生コントロール</label>
-    <audio id="audioPlayer" controls></audio>
+  <div class="main-container">
     
-    <label style="margin-top: 12px;">再生速度</label>
-    <div class="speed-controls">
-      <button class="speed-btn" onclick="setSpeed(0.7, this)">0.7x</button>
-      <button class="speed-btn" onclick="setSpeed(0.8, this)">0.8x</button>
-      <button class="speed-btn active" onclick="setSpeed(1.0, this)">1.0x</button>
-      <button class="speed-btn" onclick="setSpeed(1.2, this)">1.2x</button>
+    <div class="card">
+      <span class="input-label">練習したい英文を入力（キーボードのマイクで音声入力もOK）:</span>
+      <textarea id="englishInput" placeholder="ここに英文を入力するか、マイクで喋って入力してください..."></textarea>
+      
+      <div class="btn-group">
+        <button class="action-btn" onclick="processText()">🎧 音声生成＆翻訳</button>
+        <button class="action-btn secondary" onclick="clearInput()">クリア</button>
+      </div>
     </div>
+
+    <div class="card result-section" id="resultCard" style="display: none;">
+      <span class="input-label">トレーニング中の英文:</span>
+      <div class="text-display" id="englishDisplay"></div>
+      
+      <div class="translation-box" id="translationDisplay" style="display: none;"></div>
+      
+      <div class="btn-group">
+        <button class="action-btn" onclick="playAudio()" style="background-color: #2ecc71;">🔊 再生する</button>
+        <button class="action-btn secondary" onclick="toggleTranslationVisibility()">🌐 翻訳を表示/非表示</button>
+      </div>
+    </div>
+
   </div>
+
+  <audio id="ttsPlayer" style="display:none;"></audio>
 
   <script>
-    const audioPlayer = document.getElementById('audioPlayer');
-    const settingsArea = document.getElementById('settingsArea');
-    const apiKeyInput = document.getElementById('apiKey');
+    let currentBlobUrl = null;
+    let currentEnglish = "";
+    let currentTranslation = "";
+    
+    // シャドーイング履歴を保存する配列（ブラウザに一時保存されます）
+    let shadowingHistory = JSON.parse(localStorage.getItem('shadow_history') || '[]');
 
-    // 起動時にAPIキーを復元
     window.onload = () => {
-      const savedKey = localStorage.getItem('openai_api_key');
-      if (savedKey) {
-        apiKeyInput.value = savedKey;
-      } else {
-        settingsArea.style.display = 'block';
+      if (!localStorage.getItem('openai_api_key')) {
+        document.getElementById('settingsArea').style.display = 'block';
       }
     };
 
-    function toggleSettings() {
-      settingsArea.style.display = settingsArea.style.display === 'none' ? 'block' : 'none';
-    }
-
     function saveApiKey() {
-      const key = apiKeyInput.value.trim();
+      const key = document.getElementById('apiKey').value.trim();
       if (key) {
         localStorage.setItem('openai_api_key', key);
-        alert('APIキーを保存しました！');
-        settingsArea.style.display = 'none';
+        document.getElementById('settingsArea').style.display = 'none';
       }
     }
 
-    async function generateAudio() {
-      const text = document.getElementById('textInput').value.trim();
+    function clearInput() {
+      document.getElementById('englishInput').value = "";
+    }
+
+    function toggleTranslationVisibility() {
+      const box = document.getElementById('translationDisplay');
+      box.style.display = (box.style.display === 'none') ? 'block' : 'none';
+    }
+
+    // --- 音声生成 & 翻訳処理 ---
+    async function processText() {
+      const text = document.getElementById('englishInput').value.trim();
       const apiKey = localStorage.getItem('openai_api_key');
-      const btn = document.getElementById('generateBtn');
 
-      if (!apiKey) {
-        alert('右上の「⚙️ APIキー設定」からOpenAIのAPIキーを登録してください。');
-        toggleSettings();
-        return;
-      }
       if (!text) {
-        alert('英文を入力してください。');
+        alert("英文を入力してください。");
+        return;
+      }
+      if (!apiKey) {
+        alert("APIキーを設定してください。");
         return;
       }
 
-      // ボタンをローディング状態に
-      btn.disabled = true;
-      btn.textContent = '音声を生成中... (数秒かかります)';
+      currentEnglish = text;
+      document.getElementById('englishDisplay').textContent = text;
+      document.getElementById('resultCard').style.display = 'block';
+      
+      // 翻訳ボックスを一旦隠して「翻訳中...」にする
+      const transBox = document.getElementById('translationDisplay');
+      transBox.style.display = 'block';
+      transBox.innerHTML = "⌛ 翻訳を生成中...";
 
+      // 1. 音声の生成 (OpenAI TTS)
+      generateAudio(text, apiKey);
+
+      // 2. 翻訳の生成 (OpenAI GPT-4o-mini)
+      try {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            messages: [
+              { role: "system", content: "与えられた英文に対する、自然で綺麗な日本語訳のみを正確に出力してください。余計な解説は一切含めないでください。" },
+              { role: "user", content: text }
+            ],
+            temperature: 0.3
+          })
+        });
+
+        if (!response.ok) throw new Error("翻訳の生成に失敗しました。");
+        const data = await response.json();
+        currentTranslation = data.choices[0].message.content.trim();
+        
+        transBox.innerHTML = `<b>🇯🇵 日本語訳:</b><br>${currentTranslation}`;
+
+        // 履歴を保存（重複を防ぐチェック付き）
+        saveToHistory(currentEnglish, currentTranslation);
+
+      } catch (error) {
+        transBox.innerHTML = "⚠️ 翻訳エラー: " + error.message;
+      }
+    }
+
+    async function generateAudio(text, apiKey) {
       try {
         const response = await fetch('https://api.openai.com/v1/audio/speech', {
           method: 'POST',
@@ -199,40 +272,72 @@
           },
           body: JSON.stringify({
             model: 'tts-1',
-            voice: 'nova', // 非常に自然で聴きやすい女性の声
+            voice: 'nova', // 聞き取りやすい女性音声
             input: text
           })
         });
 
-        if (!response.ok) {
-          throw new Error('APIエラー: キーが間違っているか、利用上限の可能性があります。');
-        }
-
+        if (!response.ok) throw new Error('音声の生成に失敗しました。');
+        
         const blob = await response.blob();
-        const audioUrl = URL.createObjectURL(blob);
+        if (currentBlobUrl) URL.revokeObjectURL(currentBlobUrl); // 古いメモリを解放
+        currentBlobUrl = URL.createObjectURL(blob);
         
-        audioPlayer.src = audioUrl;
-        document.getElementById('playerArea').style.display = 'block';
-        
-        // 自動再生
-        audioPlayer.play();
-
+        playAudio();
       } catch (error) {
-        alert(error.message);
-      } finally {
-        btn.disabled = false;
-        btn.textContent = '高音質AIで音声を生成';
+        alert("音声エラー: " + error.message);
       }
     }
 
-    function setSpeed(rate, btnElement) {
-      audioPlayer.playbackRate = rate;
-      
-      // ボタンのアクティブ状態を切り替え
-      document.querySelectorAll('.speed-btn').forEach(btn => {
-        btn.classList.remove('active');
+    function playAudio() {
+      if (!currentBlobUrl) return;
+      const player = document.getElementById('ttsPlayer');
+      player.src = currentBlobUrl;
+      player.play().catch(e => alert("再生エラー: マナーモード（消音スイッチ）を解除してください。"));
+    }
+
+    // --- 履歴のローカル保存処理 ---
+    function saveToHistory(english, japanese) {
+      // すでに全く同じ英文が履歴にあればスキップ
+      if (shadowingHistory.some(item => item.english === english)) return;
+
+      shadowingHistory.push({
+        date: new Date().toISOString().slice(0, 10),
+        english: english,
+        japanese: japanese
       });
-      btnElement.classList.add('active');
+
+      localStorage.setItem('shadow_history', JSON.stringify(shadowingHistory));
+    }
+
+    // --- スプレッドシート（CSV）書き出し機能 ---
+    function exportHistory() {
+      if (shadowingHistory.length === 0) {
+        alert("まだ練習した英文の履歴がありません。フレーズを入力して練習するとここに蓄積されます。");
+        return;
+      }
+
+      let csvContent = "\uFEFF"; // Excel用BOM（文字化け対策）
+      csvContent += "練習日,英文フレーズ,日本語訳\n";
+
+      shadowingHistory.forEach(item => {
+        let date = `"${item.date.replace(/"/g, '""')}"`;
+        let english = `"${item.english.replace(/"/g, '""')}"`;
+        let japanese = `"${item.japanese.replace(/"/g, '""')}"`;
+        csvContent += `${date},${english},${japanese}\n`;
+      });
+
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      
+      const today = new Date().toISOString().slice(0, 10);
+      link.setAttribute("href", url);
+      link.setAttribute("download", `Shadowing_フレーズ帳_${today}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
   </script>
 </body>
